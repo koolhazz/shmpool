@@ -5,17 +5,25 @@
 #include <tr1/unordered_set>
 
 using std::tr1::unordered_set;
-using std::string
+using std::string;
 
 class shm_pool_t {
 public:
-	shm_pool_t() {}
-	~shm_pool_t() {}
+	shm_pool_t(unsigned int value):
+		_size(0),
+		_wmk(75),
+		_fd(-1),
+		_pool(NULL),
+		_value(value)		
+	{}
+	~shm_pool_t() {__pool_delete();}
 public:
 	int create(const char* file, unsigned long len);
 	int shink();
 	void* alloc(unsigned long size);
 	void free(void* ptr);
+	unsigned long unused() const { return _free.size() * _value; }
+	unsigned long used() const { return _use.size() * _value; }
 private:
 	int __shm_create();
 	int __shm_delete();
@@ -27,6 +35,7 @@ private:
 	unsigned int			_wmk;
 	int						_fd;
 	void*					_pool;
+	unsigned int			_value;
 	unordered_set<void*> 	_use;
 	unordered_set<void*> 	_free;
 };

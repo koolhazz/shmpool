@@ -1,19 +1,28 @@
 #include "shmpool.h"
 #include <unistd.h>
-
+#include <sys/mman.h>
+#include <fcntl.h>
 int 
 shm_pool_t::create(const char* file, unsigned long len)
 {
+	int ret;
+	
 	this->_file = file;
 	this->_size = len;
 	
-	return this->__shm_create();
+	ret = this->__shm_create();
+	
+	if (ret == -1) return ret;
+	
+	ret = this->__pool_create();
+	
+	return ret;
 }
 
 int 
 shm_pool_t::__shm_create()
 {
-	int fd = open(file.c_str(), O_CREAT | O_TRUNC | O_RDWR, 00777);
+	int fd = open(_file.c_str(), O_CREAT | O_TRUNC | O_RDWR, 00777);
 	
 	if (fd <= 0) return -1;
 	
@@ -37,12 +46,23 @@ shm_pool_t::__shm_delete()
 int 
 shm_pool_t::__pool_create()
 {
-	return 0;
+	int 	n;
+	void*	s; 
+	
+	n = _size / _value;
+	
+	for(int i = 0; i < n; i++) {
+		s = (char*)_pool + i * _value;
+		_free.insert(s);
+	}
+	
+	return _free.size();
 }
 
 int
 shm_pool_t::__pool_delete()
 {
-	_user.clear();
+	_use.clear();
 	_free.clear();
 }
+
