@@ -7,16 +7,16 @@
 using std::tr1::unordered_set;
 using std::string;
 
-class shm_pool_t {
+class mmap_pool_t {
 public:
-	shm_pool_t(unsigned int value):
+	mmap_pool_t(unsigned int value):
 		_size(0),
 		_wmk(75),
 		_fd(-1),
 		_pool(NULL),
 		_value(value)		
 	{}
-	~shm_pool_t() {__pool_delete();}
+	~mmap_pool_t() {__pool_delete();}
 public:
 	int create(const char* file, unsigned long len);
 	int shink();

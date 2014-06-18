@@ -4,7 +4,7 @@
 int
 main(int argc, char* arv[])
 {
-	shm_pool_t pool(64);
+	mmap_pool_t pool(64);
 	
 	pool.create("shmpool.data", 1024);
 	
